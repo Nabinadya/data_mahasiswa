@@ -1,0 +1,43 @@
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: GET");
+
+include_once '../config/Database.php';
+include_once '../models/Mahasiswa.php';
+
+$database = new Database();
+$db = $database->getConnection();
+$mahasiswa = new Mahasiswa($db);
+
+$keywords = isset($_GET["s"]) ? $_GET["s"] : "";
+
+if (!empty($keywords)) {
+    $stmt = $mahasiswa->search($keywords);
+    $num = $stmt->rowCount();
+
+    if ($num > 0) {
+        $mahasiswa_arr = array();
+        $mahasiswa_arr["records"] = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            extract($row);
+            $mahasiswa_item = array(
+                "id" => $id,
+                "nama" => $nama,
+                "npm" => $npm,
+                "jurusan" => $jurusan
+            );
+            array_push($mahasiswa_arr["records"], $mahasiswa_item);
+        }
+        http_response_code(200);
+        echo json_encode($mahasiswa_arr);
+    } else {
+        http_response_code(404);
+        echo json_encode(["message" => "Mahasiswa tidak ditemukan."]);
+    }
+} else {
+    http_response_code(400);
+    echo json_encode(["message" => "Harap masukkan kata kunci pencarian."]);
+}
+?>

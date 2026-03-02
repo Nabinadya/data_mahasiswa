@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Mahasiswa - Nabinadya</title>
+    <style>
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #9795F0 0%, #f7aabc 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-text { font-size: 24px; font-weight: bold; }
+
+        .search-container {
+            text-align: center;
+            flex-grow: 1;
+            margin: 0 50px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(to right, #FBC8D4, #9795F0);
+            color: #333;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-hint {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+.logo-wrapper {
+    width: 200px; 
+    height: 200px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-logo {
+    width: 10;
+    height: 100%;
+    object-fit: contain; 
+    border-radius: 50%;   
+    border: 1px solid rgba(255, 255, 255, 0); 
+}
+
+        .table-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        td {
+            padding: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .col-npm { width: 25%; }
+        .col-nama { width: 50%; }
+        .col-jurusan { width: 25%; }
+
+        tr:hover { background: rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <div class="logo-text">Data Mahasiswa</div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="search.....">
+            <div class="search-hint">*cari berdasarkan nama</div>
+        </div>
+
+        <div class="logo-wrapper">
+            <img src="logo.png" alt="Logo Nabinadya" class="user-logo">
+        </div>
+        </div>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-npm">NPM</th>
+                    <th class="col-nama">Nama</th>
+                    <th class="col-jurusan">Jurusan</th>
+                </tr>
+            </thead>
+            <tbody id="mahasiswaList">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const tableBody = document.getElementById('mahasiswaList');
+
+    async function fetchData(keyword = '') {
+        const url = keyword 
+            ? `api/search.php?s=${keyword}` 
+            : 'api/Read.php';
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            renderTable(data.records || []);
+        } catch (error) {
+            console.error("Gagal mengambil data:", error);
+        }
+    }
+
+    function renderTable(records) {
+        tableBody.innerHTML = records.map(mhs => `
+            <tr>
+                <td>${mhs.npm}</td>
+                <td>${mhs.nama}</td>
+                <td>${mhs.jurusan}</td>
+            </tr>
+        `).join('') || '<tr><td colspan="3" style="text-align:center">Data tidak ditemukan</td></tr>';
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        fetchData(e.target.value);
+    });
+
+    fetchData();
+</script>
+
+</body>
+</html>
